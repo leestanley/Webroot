@@ -62,15 +62,15 @@ class Player {
 						return s;
 					}
 				}
-				
+
 				return null;
 			}
 		}
-		
+
 		public static class Point {
 				public final int x;
 				public final int y;
-				
+
 				public Point(int x, int y) {
 						this.x = x;
 						this.y = y;
@@ -80,25 +80,25 @@ class Player {
 					return Math.hypot(p1.x - p2.x, p1.y - p2.y);
 				}
 		}
-		
+
 		public static class Ghost {
 				public Point position;
 				public int stamina;
 				public int id;
 				public int numberOfAttempts;
-				
+
 				public Ghost(Point coord, int stamina, int id, int numberOfBustersTrapping) {
 						this.position = new Point(coord.x, coord.y);
 						this.stamina = stamina;
 						this.id = id;
 						this.numberOfAttempts = numberOfBustersTrapping;
 				}
-				
+
 				public Ghost(int x, int y, int stamina, int id, int numberOfBustersTrapping) {
 						this(new Point(x, y), stamina, id, numberOfBustersTrapping);
 				}
 		}
-		
+
 		public static class Buster {
 			public Role role;
 			public Point position;
@@ -109,7 +109,7 @@ class Player {
 			public Ghost target; // only if state == TRAPPING / CARRYING
 
 			public int temp;
-			
+
 			public Buster(Role playerRole, Point pos, int teamId, int busterId, BusterState state) {
 				this.role = playerRole;
 				this.position = new Point(pos.x, pos.y);
@@ -120,7 +120,7 @@ class Player {
 
 				this.temp = -1;
 			}
-			
+
 			public Buster(Role playerRole, Point pos, int teamId, int busterId, BusterState state, int roundsStunned, Ghost target) {
 				this(playerRole, pos, teamId, busterId, state);
 
@@ -158,16 +158,16 @@ class Player {
 
 		public static int random(int min, int max)
 		{
-			int range = (max - min) + 1;  
+			int range = (max - min) + 1;
 			return (int)(Math.random() * range) + min;
 		}
-		
+
 		public static void main(String args[]) {
 				Scanner in = new Scanner(System.in);
 				int bustersPerPlayer = in.nextInt(); // the amount of busters you control
 				int ghostCount = in.nextInt(); // the amount of ghosts on the map
 				int myTeamId = in.nextInt(); // if this is 0, your base is on the top left of the map, if it is one, on the bottom right
-				
+
 				Queue<String> moves = new Queue<String>();
 				int turns = 0;
 				// game loop
@@ -185,7 +185,7 @@ class Player {
 							Role entityRole = Role.getRole(in.nextInt()); // -1 for ghosts, 0 for the HUNTER, 1 for the GHOST CATCHER and 2 for the SUPPORT
 							int state = in.nextInt(); // For busters: 0=idle, 1=carrying a ghost. For ghosts: remaining stamina points.
 							int value = in.nextInt(); // For busters: Ghost id being carried/busted or number of turns left when stunned. For ghosts: number of busters attempting to trap this ghost.
-							
+
 							if (entityRole == Role.GHOST) {
 								ghosts.add(new Ghost(x, y, state, entityId, value));
 							} else {
@@ -222,21 +222,28 @@ class Player {
 					Buster hunter = ourBusters[0];
 					Buster catcher = ourBusters[1];
 					Buster supporter = ourBusters[2];
-					
+
 					if (ghosts.size() > 0) {
 						// we found some
 						Ghost target = findSmallestGhost(ghosts);
-						
+
 						if (target.stamina > 0) {
 							// still alive
 							int distance = Point.distance(hunter.position, target.position);
 							if (distance > MIN_DISTANCE && distance < MAX_DISTANCE) {
 								// ATTACK
 								actionMove("BUST " + target.id);
-								
-								// while hunter is attacking..
-								if (myTeamId == 0) {
-									actionMove("MOVE 1600")
+								if (target.stamina <= 3) {
+									actionMove("MOVE " + catcher.position.x + " " + catcher.position.y);
+									actionMove("MOVE " + supporter.position.x + " " + supporter.position.y);
+								}
+								else if (myTeamId == 0) {
+									actionMove("MOVE 16000 9000");
+									actionMove("MOVE 16900 9000");
+								}
+								else if (myTeamId == 1) {
+									actionMove("MOVE 0 0");
+									actionMove("MOVE 0 0")
 								}
 
 							} else {
@@ -246,9 +253,9 @@ class Player {
 								int G_TargetX = Math.min(target.position.x - MAX_DISTANCE, 0);
 								int G_TargetY = Math.min(target.position.y - MAX_DISTANCE, 0);
 
-								actionMove("MOVE " + H_TargetX + " " + H_TargetY);
-								actionMove("MOVE " + G_TargetX + " " + G_TargetY);
-								actionMove("MOVE 0 0");
+								actionMove("MOVE " + H_TargetX + " " + H_TargetY); //hunter
+								actionMove("MOVE " + G_TargetX + " " + G_TargetY); //ghosthunter
+								actionMove("MOVE " + G_TargetX + " " + G_TargetY); //support moves with ghosthunter
 							}
 						} else {
 							// ready to capture
@@ -260,7 +267,7 @@ class Player {
 							}
 						}
 					} else {
-						
+
 					}
 
 					// Write an action using System.out.println()
