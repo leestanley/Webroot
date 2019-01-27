@@ -236,6 +236,8 @@ class Player {
 				int lastX = -1;
 				int lastY = -1;
 
+				Ghost focus = null;
+
 				// game loop
 				while (true) {
 					int entities = in.nextInt(); // the number of busters and ghosts visible to you
@@ -293,7 +295,12 @@ class Player {
 						// we found some
 						lastX = random(500, FIELD_WIDTH);
 						lastY = random(300, FIELD_HEIGHT);
-						Ghost target = findSmallestGhost(ghosts);
+						Ghost target = null;
+						if (focus != null && focus.stamina > 0) {
+							target = focus;
+						} else {
+							target = findSmallestGhost(ghosts);
+						}
 
 						if (target.stamina > 0) {
 							// still alive
