@@ -228,9 +228,9 @@ class Player {
 			return false;
 		}
 
-		public static Buster findSupporter(ArrayList<Buster> list) {
+		public static Buster findEnemyTarget(ArrayList<Buster> list, Role pRole) {
 			for (Buster p: list) {
-				if (p.role == Role.SUPPORT) {
+				if (p.role == pRole) {
 					return p;
 				}
 			}
@@ -309,7 +309,7 @@ class Player {
 					Buster catcher = ourBusters.get(1);
 					Buster supporter = ourBusters.get(2);
 
-					Buster enemySupporter = findSupporter(theirBusters);
+					Buster enemyBTarget = findEnemyTarget(theirBusters, Role.CATCHER);
 
 					if (ghosts.size() > 0) {
 						// we found some
@@ -334,14 +334,14 @@ class Player {
 									} else if (dropRes == "released") {
 										targetId = -1;
 									}
-									if (enemySupporter == null) {
+									if (enemyBTarget == null) {
 										actionMove("MOVE " + supporter.position.x + " " + supporter.position.y);
 									} else {
 										if ((turns - lastTurnStunned) >= 10) {
-											actionMove("STUN " + enemySupporter.id);
+											actionMove("STUN " + enemyBTarget.id);
 											lastTurnStunned = turns;
 										} else {
-											actionMove("MOVE " + enemySupporter.position.x + " " + enemySupporter.position.y);
+											actionMove("MOVE " + enemyBTarget.position.x + " " + enemyBTarget.position.y);
 										}
 									}
 								}
@@ -354,16 +354,16 @@ class Player {
 										targetId = -1;
 									}
 
-									if (enemySupporter == null) {
+									if (enemyBTarget == null) {
 										if (!supporterAttackPhase(goal, myTeamId, supporter, theirBusters)) {
 											actionMove("MOVE " + goal.x + " " + goal.y);
 										}
 									} else {
 										if ((turns - lastTurnStunned) >= 10) {
-											actionMove("STUN " + enemySupporter.id);
+											actionMove("STUN " + enemyBTarget.id);
 											lastTurnStunned = turns;
 										} else {
-											actionMove("MOVE " + enemySupporter.position.x + " " + enemySupporter.position.y);
+											actionMove("MOVE " + enemyBTarget.position.x + " " + enemyBTarget.position.y);
 										}
 									}
 								}
@@ -376,20 +376,19 @@ class Player {
 										targetId = -1;
 									}
 
-									if (enemySupporter == null) {
+									if (enemyBTarget == null) {
 										if (!supporterAttackPhase(goal, myTeamId, supporter, theirBusters)) {
 											actionMove("MOVE " + goal.x + " " + goal.y);
 										}
 									} else {
 										if ((turns - lastTurnStunned) >= 10) {
-											actionMove("STUN " + enemySupporter.id);
+											actionMove("STUN " + enemyBTarget.id);
 											lastTurnStunned = turns;
 										} else {
-											actionMove("MOVE " + enemySupporter.position.x + " " + enemySupporter.position.y);
+											actionMove("MOVE " + enemyBTarget.position.x + " " + enemyBTarget.position.y);
 										}
 									}
 								}
-
 							} else {
 								int H_TargetX = Math.max(target.position.x - MIN_DISTANCE, 0);
 								int H_TargetY = Math.max(target.position.y - MIN_DISTANCE, 0);
@@ -404,14 +403,14 @@ class Player {
 								} else if (dropRes == "released") {
 									targetId = -1;
 								}
-								if (enemySupporter == null) {
+								if (enemyBTarget == null) {
 									actionMove("MOVE " + G_TargetX + " " + G_TargetY); //support moves with ghosthunter
 								} else {
 									if ((turns - lastTurnStunned) >= 10) {
-										actionMove("STUN " + enemySupporter.id);
+										actionMove("STUN " + enemyBTarget.id);
 										lastTurnStunned = turns;
 									} else {
-										actionMove("MOVE " + enemySupporter.position.x + " " + enemySupporter.position.y);
+										actionMove("MOVE " + enemyBTarget.position.x + " " + enemyBTarget.position.y);
 									}
 								}
 							}
@@ -426,14 +425,14 @@ class Player {
 								} else if (dropRes == "released") {
 									targetId = -1;
 								}
-								if (enemySupporter == null) {
+								if (enemyBTarget == null) {
 									actionMove("MOVE " + supporter.position.x + " " + supporter.position.y);
 								} else {
 									if ((turns - lastTurnStunned) >= 10) {
-										actionMove("STUN " + enemySupporter.id);
+										actionMove("STUN " + enemyBTarget.id);
 										lastTurnStunned = turns;
 									} else {
-										actionMove("MOVE " + enemySupporter.position.x + " " + enemySupporter.position.y);
+										actionMove("MOVE " + enemyBTarget.position.x + " " + enemyBTarget.position.y);
 									}
 								}
 							} else {
@@ -447,14 +446,14 @@ class Player {
 								} else if (dropRes == "released") {
 									targetId = -1;
 								}
-								if (enemySupporter == null) {
+								if (enemyBTarget == null) {
 									actionMove("MOVE " + supporter.position.x + " " + supporter.position.y);
 								} else {
 									if ((turns - lastTurnStunned) >= 10) {
-										actionMove("STUN " + enemySupporter.id);
+										actionMove("STUN " + enemyBTarget.id);
 										lastTurnStunned = turns;
 									} else {
-										actionMove("MOVE " + enemySupporter.position.x + " " + enemySupporter.position.y);
+										actionMove("MOVE " + enemyBTarget.position.x + " " + enemyBTarget.position.y);
 									}
 								}
 							}
@@ -480,14 +479,18 @@ class Player {
 						} else if (dropRes == "released") {
 							targetId = -1;
 						}
-						if (enemySupporter == null) {
-							actionMove("MOVE " + lastX + " " + lastY);
+						if (enemyBTarget == null) {
+							if (myTeamId == 0) {
+								actionMove("MOVE 15800 8800");
+							} else {
+								actionMove("MOVE 0 0");
+							}
 						} else {
 							if ((turns - lastTurnStunned) >= 10) {
-								actionMove("STUN " + enemySupporter.id);
+								actionMove("STUN " + enemyBTarget.id);
 								lastTurnStunned = turns;
 							} else {
-								actionMove("MOVE " + enemySupporter.position.x + " " + enemySupporter.position.y);
+								actionMove("MOVE " + enemyBTarget.position.x + " " + enemyBTarget.position.y);
 							}
 						}
 					}
