@@ -241,7 +241,9 @@ class Player {
 				int lastX = -1;
 				int lastY = -1;
 
-				Ghost target = null;
+				int targetId = -1;
+
+				Queue<Integer> missedGhosts = new LinkedList<Integer>();
 
 				// game loop
 				while (true) {
@@ -301,8 +303,9 @@ class Player {
 						lastX = random(500, FIELD_WIDTH);
 						lastY = random(300, FIELD_HEIGHT);
 						
-						if (target == null) {
-							target = findSmallestGhost(ghosts);
+						Ghost target = findSmallestGhost(ghosts);
+						if (targetId > 0) {
+							target = findById(ghosts, targetId);
 						}
 
 						if (target.stamina > 0) {
@@ -312,21 +315,21 @@ class Player {
 								// ATTACK
 								actionMove("BUST " + target.id);
 								if (target.stamina <= 10) {
-									if (dropoff(catcher, myTeamId) != "released") {
+									String dropRes = dropoff(catcher, myTeamId);
+									if (dropRes == "failed") {
 										actionMove("MOVE " + hunter.position.x + " " + hunter.position.y);
-									} else {
-										target = null;
-										actionMove("MOVE " + hunter.position.x + " " + hunter.position.y);
+									} else if (dropRes == "released") {
+										targetId = -1;
 									}
 									actionMove("MOVE " + supporter.position.x + " " + supporter.position.y);
 								}
 								else if (myTeamId == 0) {
 									Point goal = new Point(13500, 6400);
-									if (dropoff(catcher, myTeamId) != "released") {
+									String dropRes = dropoff(catcher, myTeamId);
+									if (dropRes == "failed") {
 										actionMove("MOVE " + goal.x + " " + goal.y);
-									} else {
-										target = null;
-										actionMove("MOVE " + goal.x + " " + goal.y);
+									} else if (dropRes == "released") {
+										targetId = -1;
 									}
 
 									if (!supporterAttackPhase(goal, myTeamId, supporter, theirBusters)) {
@@ -335,11 +338,11 @@ class Player {
 								}
 								else if (myTeamId == 1) {
 									Point goal = new Point(2200, 1800);
-									if (dropoff(catcher, myTeamId) != "released") {
+									String dropRes = dropoff(catcher, myTeamId);
+									if (dropRes == "failed") {
 										actionMove("MOVE " + goal.x + " " + goal.y);
-									} else {
-										target = null;
-										actionMove("MOVE " + goal.x + " " + goal.y);
+									} else if (dropRes == "released") {
+										targetId = -1;
 									}
 
 									if (!supporterAttackPhase(goal, myTeamId, supporter, theirBusters)) {
@@ -355,11 +358,11 @@ class Player {
 								int G_TargetY = Math.max(target.position.y - MAX_DISTANCE, 0);
 
 								actionMove("MOVE " + H_TargetX + " " + H_TargetY); //hunter
-								if (dropoff(catcher, myTeamId) != "released") {
+								String dropRes = dropoff(catcher, myTeamId);
+								if (dropRes == "failed") {
 									actionMove("MOVE " + G_TargetX + " " + G_TargetY); //ghosthunter
-								} else {
-									target = null;
-									actionMove("MOVE " + G_TargetX + " " + G_TargetY); //ghosthunter
+								} else if (dropRes == "released") {
+									targetId = -1;
 								}
 								actionMove("MOVE " + G_TargetX + " " + G_TargetY); //support moves with ghosthunter
 							}
@@ -368,10 +371,11 @@ class Player {
 							double distance = Point.distance(catcher.position, target.position);
 							if (distance > MIN_DISTANCE && distance < MAX_DISTANCE) {
 								actionMove("MOVE " + hunter.position.x + " " + hunter.position.y);
-								if (dropoff(catcher, myTeamId) != "released") {
+								String dropRes = dropoff(catcher, myTeamId);
+								if (dropRes == "failed") {
 									actionMove("TRAP " + target.id);
-								} else {
-									target = null;
+								} else if (dropRes == "released") {
+									targetId = -1;
 								}
 								actionMove("MOVE " + supporter.position.x + " " + supporter.position.y);
 							} else {
@@ -379,10 +383,11 @@ class Player {
 								int G_TargetY = Math.max(target.position.y - MAX_DISTANCE, 0);
 
 								actionMove("MOVE " + hunter.position.x + " " + hunter.position.y);
-								if (dropoff(catcher, myTeamId) != "released") {
+								String dropRes = dropoff(catcher, myTeamId);
+								if (dropRes == "failed") {
 									actionMove("MOVE " + G_TargetX + " " + G_TargetY);
-								} else {
-									target = null;
+								} else if (dropRes == "released") {
+									targetId = -1;
 								}
 								actionMove("MOVE " + supporter.position.x + " " + supporter.position.y);
 							}
@@ -402,10 +407,11 @@ class Player {
 						}
 
 						actionMove("MOVE " + lastX + " " + lastY);
-						if (dropoff(catcher, myTeamId) != "released") {
+						String dropRes = dropoff(catcher, myTeamId);
+						if (dropRes == "failed") {
 							actionMove("MOVE " + lastX + " " + lastY);
-						} else {
-							target = null;
+						} else if (dropRes == "released") {
+							targetId = -1;
 						}
 						actionMove("MOVE " + lastX + " " + lastY);
 					}
