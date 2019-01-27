@@ -228,6 +228,16 @@ class Player {
 			return false;
 		}
 
+		public static Buster findSupporter(ArrayList<Buster> list) {
+			for (Buster p: list) {
+				if (p.role == Role.SUPPORT) {
+					return p;
+				}
+			}
+
+			return null;
+		}
+
 		public static void main(String args[]) {
 				Scanner in = new Scanner(System.in);
 				int bustersPerPlayer = in.nextInt(); // the amount of busters you control
@@ -243,7 +253,7 @@ class Player {
 
 				int targetId = -1;
 
-				Queue<Integer> missedGhosts = new LinkedList<Integer>();
+				int followId = -1; // if < 0, just do whatever until spotted
 
 				// game loop
 				while (true) {
@@ -298,6 +308,8 @@ class Player {
 					Buster catcher = ourBusters.get(1);
 					Buster supporter = ourBusters.get(2);
 
+					Buster enemySupporter = findSupporter(theirBusters);
+
 					if (ghosts.size() > 0) {
 						// we found some
 						lastX = random(500, FIELD_WIDTH);
@@ -321,7 +333,11 @@ class Player {
 									} else if (dropRes == "released") {
 										targetId = -1;
 									}
-									actionMove("MOVE " + supporter.position.x + " " + supporter.position.y);
+									if (enemySupporter == null) {
+										actionMove("MOVE " + supporter.position.x + " " + supporter.position.y);
+									} else {
+										actionMove("MOVE " + enemySupporter.position.x + " " + enemySupporter.position.y);
+									}
 								}
 								else if (myTeamId == 0) {
 									Point goal = new Point(13500, 6400);
@@ -332,8 +348,12 @@ class Player {
 										targetId = -1;
 									}
 
-									if (!supporterAttackPhase(goal, myTeamId, supporter, theirBusters)) {
-										actionMove("MOVE " + goal.x + " " + goal.y);
+									if (enemySupporter == null) {
+										if (!supporterAttackPhase(goal, myTeamId, supporter, theirBusters)) {
+											actionMove("MOVE " + goal.x + " " + goal.y);
+										}
+									} else {
+										actionMove("MOVE " + enemySupporter.position.x + " " + enemySupporter.position.y);
 									}
 								}
 								else if (myTeamId == 1) {
@@ -345,8 +365,12 @@ class Player {
 										targetId = -1;
 									}
 
-									if (!supporterAttackPhase(goal, myTeamId, supporter, theirBusters)) {
-										actionMove("MOVE " + goal.x + " " + goal.y);
+									if (enemySupporter == null) {
+										if (!supporterAttackPhase(goal, myTeamId, supporter, theirBusters)) {
+											actionMove("MOVE " + goal.x + " " + goal.y);
+										}
+									} else {
+										actionMove("MOVE " + enemySupporter.position.x + " " + enemySupporter.position.y);
 									}
 								}
 
@@ -364,7 +388,11 @@ class Player {
 								} else if (dropRes == "released") {
 									targetId = -1;
 								}
-								actionMove("MOVE " + G_TargetX + " " + G_TargetY); //support moves with ghosthunter
+								if (enemySupporter == null) {
+									actionMove("MOVE " + G_TargetX + " " + G_TargetY); //support moves with ghosthunter
+								} else {
+									actionMove("MOVE " + enemySupporter.position.x + " " + enemySupporter.position.y);
+								}
 							}
 						} else {
 							// ready to capture
@@ -377,7 +405,11 @@ class Player {
 								} else if (dropRes == "released") {
 									targetId = -1;
 								}
-								actionMove("MOVE " + supporter.position.x + " " + supporter.position.y);
+								if (enemySupporter == null) {
+									actionMove("MOVE " + supporter.position.x + " " + supporter.position.y);
+								} else {
+									actionMove("MOVE " + enemySupporter.position.x + " " + enemySupporter.position.y);
+								}
 							} else {
 								int G_TargetX = Math.max(target.position.x - MAX_DISTANCE, 0);
 								int G_TargetY = Math.max(target.position.y - MAX_DISTANCE, 0);
@@ -389,7 +421,11 @@ class Player {
 								} else if (dropRes == "released") {
 									targetId = -1;
 								}
-								actionMove("MOVE " + supporter.position.x + " " + supporter.position.y);
+								if (enemySupporter == null) {
+									actionMove("MOVE " + supporter.position.x + " " + supporter.position.y);
+								} else {
+									actionMove("MOVE " + enemySupporter.position.x + " " + enemySupporter.position.y);
+								}
 							}
 						}
 					} else {
@@ -413,7 +449,11 @@ class Player {
 						} else if (dropRes == "released") {
 							targetId = -1;
 						}
-						actionMove("MOVE " + lastX + " " + lastY);
+						if (enemySupporter == null) {
+							actionMove("MOVE " + lastX + " " + lastY);
+						} else {
+							actionMove("MOVE " + enemySupporter.position.x + " " + enemySupporter.position.y);
+						}
 					}
 
 					// Write an action using System.out.println()
