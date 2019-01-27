@@ -9,7 +9,7 @@ import java.lang.*;
 class Player {
 
 		public static final int MIN_DISTANCE = 900;
-		public static final int MAX_DISTANCE = 1760;
+		public static final int MAX_DISTANCE = 1600;
 
 		public static final int FIELD_WIDTH = 16000;
 		public static final int FIELD_HEIGHT = 9000;
@@ -164,12 +164,15 @@ class Player {
 			return (int)(Math.random() * range) + min;
 		}
 
-		public static boolean dropoff(Buster player, int teamId) {
+		// returns: either "released", "moved", or "failed"
+		public static String dropoff(Buster player, int teamId) {
 			if (player.role == Role.CATCHER && player.state == BusterState.CARRYING) {
 				if (teamId == 0) {
 					Point origin = new Point(0, 0);
 					if (Point.distance(player.position, origin) <= DROPOFF_DISTANCE) {
 						actionMove("RELEASE");
+
+						return "released";
 					} else {
 						actionMove("MOVE 300 300");
 					}
@@ -177,14 +180,16 @@ class Player {
 					Point origin = new Point(FIELD_WIDTH, FIELD_HEIGHT);
 					if (Point.distance(player.position, origin) <= DROPOFF_DISTANCE) {
 						actionMove("RELEASE");
+
+						return "released";
 					} else {
 						actionMove("MOVE 15300 7800");
 					}
 				}
 
-				return true;
+				return "moved";
 			} else {
-				return false;
+				return "failed";
 			}
 		}
 
@@ -236,7 +241,7 @@ class Player {
 				int lastX = -1;
 				int lastY = -1;
 
-				Ghost focus = null;
+				Ghost target = null;
 
 				// game loop
 				while (true) {
@@ -295,10 +300,8 @@ class Player {
 						// we found some
 						lastX = random(500, FIELD_WIDTH);
 						lastY = random(300, FIELD_HEIGHT);
-						Ghost target = null;
-						if (focus != null && focus.stamina > 0) {
-							target = focus;
-						} else {
+						
+						if (target == null) {
 							target = findSmallestGhost(ghosts);
 						}
 
@@ -309,14 +312,20 @@ class Player {
 								// ATTACK
 								actionMove("BUST " + target.id);
 								if (target.stamina <= 10) {
-									if (!dropoff(catcher, myTeamId)) {
+									if (dropoff(catcher, myTeamId) != "released") {
+										actionMove("MOVE " + hunter.position.x + " " + hunter.position.y);
+									} else {
+										target = null;
 										actionMove("MOVE " + hunter.position.x + " " + hunter.position.y);
 									}
 									actionMove("MOVE " + supporter.position.x + " " + supporter.position.y);
 								}
 								else if (myTeamId == 0) {
 									Point goal = new Point(13500, 6400);
-									if (!dropoff(catcher, myTeamId)) {
+									if (dropoff(catcher, myTeamId) != "released") {
+										actionMove("MOVE " + goal.x + " " + goal.y);
+									} else {
+										target = null;
 										actionMove("MOVE " + goal.x + " " + goal.y);
 									}
 
@@ -326,8 +335,11 @@ class Player {
 								}
 								else if (myTeamId == 1) {
 									Point goal = new Point(2200, 1800);
-									if (!dropoff(catcher, myTeamId)) {
-										actionMove("MOVE 2200 1800");
+									if (dropoff(catcher, myTeamId) != "released") {
+										actionMove("MOVE " + goal.x + " " + goal.y);
+									} else {
+										target = null;
+										actionMove("MOVE " + goal.x + " " + goal.y);
 									}
 
 									if (!supporterAttackPhase(goal, myTeamId, supporter, theirBusters)) {
@@ -343,7 +355,10 @@ class Player {
 								int G_TargetY = Math.max(target.position.y - MAX_DISTANCE, 0);
 
 								actionMove("MOVE " + H_TargetX + " " + H_TargetY); //hunter
-								if (!dropoff(catcher, myTeamId)) {
+								if (dropoff(catcher, myTeamId) != "released") {
+									actionMove("MOVE " + G_TargetX + " " + G_TargetY); //ghosthunter
+								} else {
+									target = null;
 									actionMove("MOVE " + G_TargetX + " " + G_TargetY); //ghosthunter
 								}
 								actionMove("MOVE " + G_TargetX + " " + G_TargetY); //support moves with ghosthunter
@@ -353,8 +368,10 @@ class Player {
 							double distance = Point.distance(catcher.position, target.position);
 							if (distance > MIN_DISTANCE && distance < MAX_DISTANCE) {
 								actionMove("MOVE " + hunter.position.x + " " + hunter.position.y);
-								if (!dropoff(catcher, myTeamId)) {
+								if (dropoff(catcher, myTeamId) != "released") {
 									actionMove("TRAP " + target.id);
+								} else {
+									target = null;
 								}
 								actionMove("MOVE " + supporter.position.x + " " + supporter.position.y);
 							} else {
@@ -362,8 +379,10 @@ class Player {
 								int G_TargetY = Math.max(target.position.y - MAX_DISTANCE, 0);
 
 								actionMove("MOVE " + hunter.position.x + " " + hunter.position.y);
-								if (!dropoff(catcher, myTeamId)) {
+								if (dropoff(catcher, myTeamId) != "released") {
 									actionMove("MOVE " + G_TargetX + " " + G_TargetY);
+								} else {
+									target = null;
 								}
 								actionMove("MOVE " + supporter.position.x + " " + supporter.position.y);
 							}
@@ -383,8 +402,10 @@ class Player {
 						}
 
 						actionMove("MOVE " + lastX + " " + lastY);
-						if (!dropoff(catcher, myTeamId)) {
+						if (dropoff(catcher, myTeamId) != "released") {
 							actionMove("MOVE " + lastX + " " + lastY);
+						} else {
+							target = null;
 						}
 						actionMove("MOVE " + lastX + " " + lastY);
 					}
