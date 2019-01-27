@@ -154,7 +154,7 @@ class Player {
 					gId = target.id;
 				}
 			}
-			
+
 			return findById(list, gId);
 		}
 
@@ -195,7 +195,7 @@ class Player {
 				for (Buster e: enemies) {
 					if (e.role == Role.CATCHER && e.state == BusterState.CARRYING) {
 						target = e;
-						
+
 						break;
 					}
 				}
@@ -204,9 +204,9 @@ class Player {
 					if (Point.distance(target.position, player.position) <= 1760) {
 						actionMove("STUN " + target.id);
 					} else {
-						int S_TargetX = Math.min(target.position.x - 800, 0);
-						int S_TargetY = Math.min(target.position.y - 800, 0);
-						
+						int S_TargetX = Math.max(target.position.x - 800, 0);
+						int S_TargetY = Math.max(target.position.y - 800, 0);
+
 						actionMove("MOVE " + S_TargetX + " " + S_TargetY);
 					}
 				} else {
@@ -292,7 +292,7 @@ class Player {
 					if (ghosts.size() > 0) {
 						// we found some
 						lastX = random(500, FIELD_WIDTH);
-						lastY = random(300, FIELD_HEIGHT); 
+						lastY = random(300, FIELD_HEIGHT);
 						Ghost target = findSmallestGhost(ghosts);
 
 						if (target.stamina > 0) {
@@ -312,7 +312,7 @@ class Player {
 									if (!dropoff(catcher, myTeamId)) {
 										actionMove("MOVE " + goal.x + " " + goal.y);
 									}
-									
+
 									if (!supporterAttackPhase(goal, myTeamId, supporter, theirBusters)) {
 										actionMove("MOVE " + goal.x + " " + goal.y);
 									}
@@ -322,18 +322,18 @@ class Player {
 									if (!dropoff(catcher, myTeamId)) {
 										actionMove("MOVE 2200 1800");
 									}
-									
+
 									if (!supporterAttackPhase(goal, myTeamId, supporter, theirBusters)) {
 										actionMove("MOVE " + goal.x + " " + goal.y);
 									}
 								}
 
 							} else {
-								int H_TargetX = Math.min(target.position.x - MIN_DISTANCE, 0);
-								int H_TargetY = Math.min(target.position.y - MIN_DISTANCE, 0);
+								int H_TargetX = Math.max(target.position.x - MIN_DISTANCE, 0);
+								int H_TargetY = Math.max(target.position.y - MIN_DISTANCE, 0);
 
-								int G_TargetX = Math.min(target.position.x - MAX_DISTANCE, 0);
-								int G_TargetY = Math.min(target.position.y - MAX_DISTANCE, 0);
+								int G_TargetX = Math.max(target.position.x - MAX_DISTANCE, 0);
+								int G_TargetY = Math.max(target.position.y - MAX_DISTANCE, 0);
 
 								actionMove("MOVE " + H_TargetX + " " + H_TargetY); //hunter
 								if (!dropoff(catcher, myTeamId)) {
@@ -351,8 +351,8 @@ class Player {
 								}
 								actionMove("MOVE " + supporter.position.x + " " + supporter.position.y);
 							} else {
-								int G_TargetX = Math.min(target.position.x - MAX_DISTANCE, 0);
-								int G_TargetY = Math.min(target.position.y - MAX_DISTANCE, 0);
+								int G_TargetX = Math.max(target.position.x - MAX_DISTANCE, 0);
+								int G_TargetY = Math.max(target.position.y - MAX_DISTANCE, 0);
 
 								actionMove("MOVE " + hunter.position.x + " " + hunter.position.y);
 								if (!dropoff(catcher, myTeamId)) {
