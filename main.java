@@ -254,6 +254,7 @@ class Player {
 				int targetId = -1;
 
 				int followId = -1; // if < 0, just do whatever until spotted
+				int lastTurnStunned = 0;
 
 				// game loop
 				while (true) {
@@ -336,7 +337,12 @@ class Player {
 									if (enemySupporter == null) {
 										actionMove("MOVE " + supporter.position.x + " " + supporter.position.y);
 									} else {
-										actionMove("MOVE " + enemySupporter.position.x + " " + enemySupporter.position.y);
+										if ((turns - lastTurnStunned) >= 10) {
+											actionMove("STUN " + enemySupporter.id);
+											lastTurnStunned = turns;
+										} else {
+											actionMove("MOVE " + enemySupporter.position.x + " " + enemySupporter.position.y);
+										}
 									}
 								}
 								else if (myTeamId == 0) {
@@ -353,7 +359,12 @@ class Player {
 											actionMove("MOVE " + goal.x + " " + goal.y);
 										}
 									} else {
-										actionMove("MOVE " + enemySupporter.position.x + " " + enemySupporter.position.y);
+										if ((turns - lastTurnStunned) >= 10) {
+											actionMove("STUN " + enemySupporter.id);
+											lastTurnStunned = turns;
+										} else {
+											actionMove("MOVE " + enemySupporter.position.x + " " + enemySupporter.position.y);
+										}
 									}
 								}
 								else if (myTeamId == 1) {
@@ -370,7 +381,12 @@ class Player {
 											actionMove("MOVE " + goal.x + " " + goal.y);
 										}
 									} else {
-										actionMove("MOVE " + enemySupporter.position.x + " " + enemySupporter.position.y);
+										if ((turns - lastTurnStunned) >= 10) {
+											actionMove("STUN " + enemySupporter.id);
+											lastTurnStunned = turns;
+										} else {
+											actionMove("MOVE " + enemySupporter.position.x + " " + enemySupporter.position.y);
+										}
 									}
 								}
 
@@ -391,7 +407,12 @@ class Player {
 								if (enemySupporter == null) {
 									actionMove("MOVE " + G_TargetX + " " + G_TargetY); //support moves with ghosthunter
 								} else {
-									actionMove("MOVE " + enemySupporter.position.x + " " + enemySupporter.position.y);
+									if ((turns - lastTurnStunned) >= 10) {
+										actionMove("STUN " + enemySupporter.id);
+										lastTurnStunned = turns;
+									} else {
+										actionMove("MOVE " + enemySupporter.position.x + " " + enemySupporter.position.y);
+									}
 								}
 							}
 						} else {
@@ -408,7 +429,12 @@ class Player {
 								if (enemySupporter == null) {
 									actionMove("MOVE " + supporter.position.x + " " + supporter.position.y);
 								} else {
-									actionMove("MOVE " + enemySupporter.position.x + " " + enemySupporter.position.y);
+									if ((turns - lastTurnStunned) >= 10) {
+										actionMove("STUN " + enemySupporter.id);
+										lastTurnStunned = turns;
+									} else {
+										actionMove("MOVE " + enemySupporter.position.x + " " + enemySupporter.position.y);
+									}
 								}
 							} else {
 								int G_TargetX = Math.max(target.position.x - MAX_DISTANCE, 0);
@@ -424,7 +450,12 @@ class Player {
 								if (enemySupporter == null) {
 									actionMove("MOVE " + supporter.position.x + " " + supporter.position.y);
 								} else {
-									actionMove("MOVE " + enemySupporter.position.x + " " + enemySupporter.position.y);
+									if ((turns - lastTurnStunned) >= 10) {
+										actionMove("STUN " + enemySupporter.id);
+										lastTurnStunned = turns;
+									} else {
+										actionMove("MOVE " + enemySupporter.position.x + " " + enemySupporter.position.y);
+									}
 								}
 							}
 						}
@@ -452,7 +483,12 @@ class Player {
 						if (enemySupporter == null) {
 							actionMove("MOVE " + lastX + " " + lastY);
 						} else {
-							actionMove("MOVE " + enemySupporter.position.x + " " + enemySupporter.position.y);
+							if ((turns - lastTurnStunned) >= 10) {
+								actionMove("STUN " + enemySupporter.id);
+								lastTurnStunned = turns;
+							} else {
+								actionMove("MOVE " + enemySupporter.position.x + " " + enemySupporter.position.y);
+							}
 						}
 					}
 
